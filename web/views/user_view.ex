@@ -9,10 +9,4 @@ defmodule LoudBackend.UserView do
   def render("error.json", %{message: message}) do
     %{error: message}
   end
-
-  def render("user.json", %{user: user}) do
-    %{id: user.id,
-      name: user.name,
-      password: user.password}
-  end
 end

@@ -5,7 +5,8 @@ defmodule LoudBackend.UserController do
 
   # plug Guardian.Plug.EnsureAuthenticated, handler: LoudBackend.GuardianErrorHandler when not action in [:new, :create]
 
-  defp signIn(conn, user) do
+  defp generate_jwt_and_render(conn, user) do
+    IO.inspect user
     new_conn = Guardian.Plug.api_sign_in(conn, user)
     jwt = Guardian.Plug.current_token(new_conn)
     {:ok, claims} = Guardian.Plug.claims(new_conn)
@@ -17,27 +18,42 @@ defmodule LoudBackend.UserController do
     |> render("login.json", %{jwt: jwt, exp: exp})
   end
 
-  def register(conn, %{"name" => name, "password" => password}) do
-    changeset = User.changeset(%User{}, %{name: name, password: password})
+  def register(conn, %{"username" => username, "password" => password}) do
+    changeset = User.register_changeset(%User{}, %{username: username, password: password})
 
-    if changeset.valid? do
-      {_, user} = Repo.insert(changeset)
-      signIn(conn, user)
-    else
-      conn
-      |> put_status(401)
-      |> render("error.json", message: "Could not login")
+    case Repo.insert(changeset) do
+      {:ok, user} ->
+        generate_jwt_and_render(conn, user)
+      {:error, changeset} ->
+        message = changeset.errors
+          |> Enum.map(fn({key, {message, _}}) -> ("#{key} #{message}" |> String.capitalize) end)
+          |> Enum.join(", ")
+
+        conn
+        |> put_status(401)
+        |> render("error.json", message: message)
     end
   end
 
-  def login(conn, %{"user" => user_params}) do
-    case User.find_and_confirm_password(user_params) do
-      {:ok, user} ->
-        signIn(conn, user)
-      {:error, nil} ->
+  def login(conn, %{"username" => username, "password" => password}) do
+    user = Repo.get_by(User, username: username)
+
+    case authenticate(user, password) do
+      true ->
+        generate_jwt_and_render(conn, user)
+      false ->
         conn
         |> put_status(401)
-        |> render("error.json", message: "Could not login")
+        |> render("error.json", message: "Invalid username or password")
+    end
+  end
+
+  defp authenticate(user, password) do
+    case user do
+      nil ->
+        Comeonin.Bcrypt.dummy_checkpw()
+        false
+      _ -> Comeonin.Bcrypt.checkpw(password, user.hash)
     end
   end
 

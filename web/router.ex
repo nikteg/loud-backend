@@ -11,8 +11,8 @@ defmodule LoudBackend.Router do
     pipe_through :api
 
     get "/", PageController, :index
-    post "login", UserController, :login
-    post "register", UserController, :register
+    post "/login", UserController, :login
+    post "/register", UserController, :register
     resources "/playlists", PlaylistController
   end
 end

@@ -2,11 +2,19 @@ defmodule LoudBackend.ErrorView do
   use LoudBackend.Web, :view
 
   def render("404.json", _assigns) do
-    %{errors: %{detail: "Page not found"}}
+    %{error: "Page not found"}
   end
 
   def render("500.json", _assigns) do
-    %{errors: %{detail: "Internal server error"}}
+    %{error: "Internal server error"}
+  end
+
+  def render("401.json", _assigns) do
+    %{error: "Unauthorized"}
+  end
+
+  def render("400.json", _assigns) do
+    %{error: "Bad Request"}
   end
 
   # In case no render clause matches or no

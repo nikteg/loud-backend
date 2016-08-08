@@ -36,7 +36,8 @@ defmodule LoudBackend.Mixfile do
      {:postgrex, ">= 0.0.0"},
      {:gettext, "~> 0.11"},
      {:cowboy, "~> 1.0"},
-     {:guardian, "~> 0.12.0"}]
+     {:guardian, "~> 0.12.0"},
+     {:comeonin, "~> 2.5"}]
   end
 
   # Aliases are shortcuts or tasks specific to the current project.

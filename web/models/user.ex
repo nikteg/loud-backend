@@ -2,25 +2,13 @@ defmodule LoudBackend.User do
   use LoudBackend.Web, :model
 
   schema "users" do
-    field :name, :string
+    field :username, :string
     field :password, :string, virtual: true
-    # field :hash, :string
+    field :hash, :string
+
+    has_many :playlists, LoudBackend.Playlist
 
     timestamps()
-  end
-
-  def create(params) do
-    changeset = changeset(%{}, params)
-
-    if changeset.valid? do
-      Repo.insert(changeset)
-    else
-      {:error, nil}
-    end
-  end
-
-  def find_and_confirm_password(params) do
-    Repo.get_by(User, params)
   end
 
   @doc """
@@ -28,7 +16,18 @@ defmodule LoudBackend.User do
   """
   def changeset(struct, params \\ %{}) do
     struct
-    |> cast(params, [:name, :password])
-    |> validate_required([:name, :password])
+    |> cast(params, [:username, :password])
+    |> unique_constraint(:username)
+    |> validate_required([:username, :password])
+  end
+
+  def register_changeset(struct, params \\ %{}) do
+    struct
+    |> changeset(params)
+    |> put_change(:hash, hashed_password(params[:password]))
+  end
+
+  defp hashed_password(password) do
+    Comeonin.Bcrypt.hashpwsalt(password)
   end
 end

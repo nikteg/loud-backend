@@ -3,11 +3,12 @@ defmodule LoudBackend.Repo.Migrations.CreateUser do
 
   def change do
     create table(:users) do
-      add :name, :string
-      add :password, :string
+      add :username, :string
+      add :hash, :string
 
       timestamps()
     end
 
+    create unique_index(:users, [:username])
   end
 end

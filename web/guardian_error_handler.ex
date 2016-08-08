@@ -1,7 +1,9 @@
 defmodule LoudBackend.GuardianErrorHandler do
+  use LoudBackend.Web, :controller
 
   def unauthenticated(conn, _params) do
     conn
-    |> Phoenix.Controller.render(LoudBackend.ErrorView, "500.json")
+    |> put_status(401)
+    |> render(LoudBackend.ErrorView, "401.json")
   end
 end

@@ -1,15 +1,20 @@
 defmodule LoudBackend.PlaylistController do
   use LoudBackend.Web, :controller
+  use Guardian.Phoenix.Controller
 
   alias LoudBackend.Playlist
 
-  def index(conn, _params) do
-    playlists = Repo.all(Playlist)
+  # plug Guardian.Plug.EnsureAuthenticated, [handler: LoudBackend.GuardianErrorHandler] when not action in [:index, :show]
+  plug Guardian.Plug.EnsureAuthenticated, [handler: LoudBackend.GuardianErrorHandler]
+
+  def index(conn, _params, user, _claims) do
+    playlists = Repo.all(assoc(user, :playlists))
     render(conn, "index.json", playlists: playlists)
   end
 
-  def create(conn, %{"playlist" => playlist_params}) do
+  def create(conn, %{"playlist" => playlist_params}, user, _claims) do
     changeset = Playlist.changeset(%Playlist{}, playlist_params)
+      |> Ecto.Changeset.put_assoc(:user, user)
 
     case Repo.insert(changeset) do
       {:ok, playlist} ->
@@ -24,7 +29,7 @@ defmodule LoudBackend.PlaylistController do
     end
   end
 
-  def show(conn, %{"id" => id}) do
+  def show(conn, %{"id" => id}, user, _claims) do
     playlist = Repo.get!(Playlist, id)
     render(conn, "show.json", playlist: playlist)
   end

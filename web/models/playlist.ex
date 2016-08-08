@@ -4,6 +4,8 @@ defmodule LoudBackend.Playlist do
   schema "playlists" do
     field :name, :string
 
+    belongs_to :user, LoudBackend.User
+
     timestamps()
   end
 
