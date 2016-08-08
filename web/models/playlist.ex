@@ -5,6 +5,7 @@ defmodule LoudBackend.Playlist do
     field :name, :string
 
     belongs_to :user, LoudBackend.User
+    many_to_many :tracks, LoudBackend.Track, join_through: "playlist_tracks"
 
     timestamps()
   end
@@ -15,6 +16,7 @@ defmodule LoudBackend.Playlist do
   def changeset(struct, params \\ %{}) do
     struct
     |> cast(params, [:name])
+    |> cast_assoc(:tracks)
     |> validate_required([:name])
   end
 end

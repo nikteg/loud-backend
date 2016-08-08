@@ -14,5 +14,6 @@ defmodule LoudBackend.Router do
     post "/login", UserController, :login
     post "/register", UserController, :register
     resources "/playlists", PlaylistController
+    resources "/tracks", TrackController
   end
 end
