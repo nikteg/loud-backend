@@ -19,6 +19,7 @@ defmodule LoudBackend.User do
     |> cast(params, [:username, :password])
     |> unique_constraint(:username)
     |> validate_required([:username, :password])
+    |> validate_length(:password, min: 6)
   end
 
   def register_changeset(struct, params \\ %{}) do

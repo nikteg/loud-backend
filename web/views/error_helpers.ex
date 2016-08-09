@@ -26,4 +26,9 @@ defmodule LoudBackend.ErrorHelpers do
       Gettext.dgettext(LoudBackend.Gettext, "errors", msg, opts)
     end
   end
+
+  def translate_changeset_errors(changeset) do
+    changeset.errors |> Enum.map(fn ({key, error}) ->
+      ("#{key} #{LoudBackend.ErrorHelpers.translate_error(error)}" |> String.capitalize) end)
+  end
 end

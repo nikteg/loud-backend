@@ -26,7 +26,13 @@ config :guardian, Guardian,
   issuer: "Loud",
   ttl: { 30, :days },
   secret_key: "_AbBL082GKlPjoY9o-KM78PhyALavJRtZXOW7D-ZyqE",
-  serializer: LoudBackend.GuardianSerializer
+  serializer: LoudBackend.GuardianSerializer,
+  hooks: GuardianDb
+
+config :guardian_db, GuardianDb,
+  repo: LoudBackend.Repo,
+  schema_name: "tokens",
+  sweep_interval: 120 # 120 minutes
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.

@@ -37,6 +37,7 @@ defmodule LoudBackend.Mixfile do
      {:gettext, "~> 0.11"},
      {:cowboy, "~> 1.0"},
      {:guardian, "~> 0.12.0"},
+     {:guardian_db, "~> 0.7.0"},
      {:comeonin, "~> 2.5"}]
   end
 
