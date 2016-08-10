@@ -8,7 +8,7 @@ defmodule LoudBackend.AuthController do
   plug Guardian.Plug.EnsureAuthenticated, [handler: LoudBackend.GuardianErrorHandler] when action in [:logout]
 
   def generate_token(user) do
-    with {:ok, token, full_claims} <- Guardian.encode_and_sign(user, nil, %{}),
+    with {:ok, token, full_claims} <- Guardian.encode_and_sign(user, nil, %{username: user.username, id: user.id}),
       data = %{token: token, exp: Map.get(full_claims, "exp")},
     do: {:ok, data}
   end
