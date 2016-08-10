@@ -10,7 +10,8 @@ defmodule LoudBackend.PlaylistView do
   end
 
   def render("playlist.json", %{playlist: playlist}) do
-    %{name: playlist.name,
+    %{id: playlist.id,
+      name: playlist.name,
       tracks: render_many(playlist.tracks, LoudBackend.TrackView, "track.json")}
   end
 end
