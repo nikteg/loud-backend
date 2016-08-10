@@ -38,6 +38,7 @@ defmodule LoudBackend.Mixfile do
      {:cowboy, "~> 1.0"},
      {:guardian, "~> 0.12.0"},
      {:guardian_db, "~> 0.7.0"},
+     {:cors_plug, "~> 1.1"},
      {:comeonin, "~> 2.5"}]
   end
 

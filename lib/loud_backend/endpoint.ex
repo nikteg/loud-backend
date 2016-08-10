@@ -34,5 +34,7 @@ defmodule LoudBackend.Endpoint do
     key: "_loud_backend_key",
     signing_salt: "8bJxqp7M"
 
+  plug CORSPlug
+
   plug LoudBackend.Router
 end
