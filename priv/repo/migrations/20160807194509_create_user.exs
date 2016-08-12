@@ -2,8 +2,10 @@ defmodule LoudBackend.Repo.Migrations.CreateUser do
   use Ecto.Migration
 
   def change do
+    execute("CREATE EXTENSION IF NOT EXISTS \"citext\";")
+
     create table(:users) do
-      add :username, :string
+      add :username, :citext
       add :hash, :string
 
       timestamps()
