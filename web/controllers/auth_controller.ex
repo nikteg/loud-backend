@@ -2,6 +2,8 @@ defmodule LoudBackend.AuthController do
   use LoudBackend.Web, :controller
 
   alias LoudBackend.User
+  alias LoudBackend.Playlist
+  alias LoudBackend.Track
   import LoudBackend.ErrorHelpers, only: [translate_changeset_errors: 1]
 
   # plug Guardian.Plug.EnsureAuthenticated, handler: LoudBackend.GuardianErrorHandler when not action in [:new, :create]
@@ -30,8 +32,21 @@ defmodule LoudBackend.AuthController do
   def register(conn, %{"username" => username, "password" => password}) do
     changeset = User.register_changeset(%User{}, %{username: username, password: password})
 
+
+
     case Repo.insert(changeset) do
-      {:ok, user}         -> generate_token_and_render(conn, user)
+      {:ok, user} ->
+        # Start temporary shit
+        tracks = Repo.all(Track)
+
+        changeset = Playlist.changeset(%Playlist{}, %{name: "Sample playlist 1"})
+          |> Ecto.Changeset.put_assoc(:user, user)
+          |> Ecto.Changeset.put_assoc(:tracks, tracks)
+
+        Repo.insert!(changeset)
+        # End temporary shit
+
+        generate_token_and_render(conn, user)
       {:error, changeset} ->
         conn
         |> put_status(401)
