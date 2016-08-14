@@ -5,7 +5,9 @@ defmodule LoudBackend.TrackController do
 
   def index(conn, _params) do
     tracks = Repo.all(Track)
-    render(conn, "index.json", tracks: tracks)
+
+    conn
+    |> json(tracks)
   end
 
   def create(conn, %{"track" => track_params}) do
