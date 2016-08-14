@@ -37,7 +37,12 @@ defmodule LoudBackend.PlaylistController do
   end
 
   def show(conn, %{"id" => id}) do
-    [playlist] = Repo.all(from(p in Playlist, where: p.id == ^id, preload: :tracks))
+    query = from p in Playlist,
+      where: p.id == ^id,
+      join: t in assoc(p, :tracks),
+      order_by: t.id
+
+    [playlist] = Repo.all(query)
     conn |> json(playlist)
   end
 
