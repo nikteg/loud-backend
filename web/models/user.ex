@@ -1,6 +1,7 @@
 defmodule LoudBackend.User do
   use LoudBackend.Web, :model
 
+  @derive {Poison.Encoder, only: [:id, :username]}
   schema "users" do
     field :username, :string
     field :password, :string, virtual: true

@@ -1,6 +1,7 @@
 defmodule LoudBackend.Track do
   use LoudBackend.Web, :model
 
+  @derive {Poison.Encoder, only: [:id, :key, :name, :artist, :duration]}
   schema "tracks" do
     field :key, :string
     field :name, :string

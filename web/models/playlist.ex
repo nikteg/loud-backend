@@ -1,11 +1,12 @@
 defmodule LoudBackend.Playlist do
   use LoudBackend.Web, :model
 
+  @derive {Poison.Encoder, only: [:id, :name, :user, :tracks]}
   schema "playlists" do
     field :name, :string
 
     belongs_to :user, LoudBackend.User
-    many_to_many :tracks, LoudBackend.Track, join_through: "playlist_tracks"
+    many_to_many :tracks, LoudBackend.Track, join_through: "playlist_tracks", on_replace: :delete
 
     timestamps()
   end

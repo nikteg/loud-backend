@@ -3,6 +3,7 @@ defmodule LoudBackend.PlaylistController do
 
   alias LoudBackend.Playlist
   alias LoudBackend.Track
+  import LoudBackend.ErrorHelpers, only: [translate_changeset_errors: 1]
 
   # plug Guardian.Plug.EnsureAuthenticated, [handler: LoudBackend.GuardianErrorHandler] when not action in [:index, :show]
   plug Guardian.Plug.EnsureAuthenticated, [handler: LoudBackend.GuardianErrorHandler]
@@ -13,23 +14,25 @@ defmodule LoudBackend.PlaylistController do
     render(conn, "index.json", playlists: playlists)
   end
 
-  def create(conn, %{"playlist" => playlist_params}) do
+  def create(conn, %{"name" => name} = params) do
+    track_ids = Map.get(params, "tracks", [])
     user = Guardian.Plug.current_resource(conn)
-    track1 = Repo.get!(Track, 1)
+    tracks = Repo.all(from t in Track, where: t.id in ^track_ids)
 
-    changeset = Playlist.changeset(%Playlist{}, playlist_params)
+    changeset = Playlist.changeset(%Playlist{}, %{name: name})
       |> Ecto.Changeset.put_assoc(:user, user)
-      |> Ecto.Changeset.put_assoc(:tracks, [track1])
+      |> Ecto.Changeset.put_assoc(:tracks, tracks)
 
     case Repo.insert(changeset) do
       {:ok, playlist} ->
+        IO.inspect playlist
         conn
         |> put_status(201)
-        |> render("show.json", playlist: playlist)
+        |> json(playlist)
       {:error, changeset} ->
         conn
-        |> put_status(:unprocessable_entity)
-        |> render(LoudBackend.ChangesetView, "error.json", changeset: changeset)
+        |> put_status(401)
+        |> json(%{error: Enum.join(translate_changeset_errors(changeset), ", ")})
     end
   end
 
@@ -38,17 +41,29 @@ defmodule LoudBackend.PlaylistController do
     render(conn, "show.json", playlist: playlist)
   end
 
-  def update(conn, %{"id" => id, "playlist" => playlist_params}) do
+  def update(conn, %{"id" => id} = params) do
     playlist = Repo.get!(Playlist, id)
-    changeset = Playlist.changeset(playlist, playlist_params)
+
+    name = Map.get(params, "name", playlist.name)
+    track_ids = Map.get(params, "tracks", [])
+
+    tracks = Repo.all(from t in Track, where: t.id in ^track_ids)
+      |> Enum.map(&Ecto.Changeset.change/1)
+
+    changeset = playlist
+      |> Repo.preload(:tracks)
+      |> Repo.preload(:user)
+      |> Playlist.changeset(%{name: name})
+      |> Ecto.Changeset.put_assoc(:tracks, tracks)
 
     case Repo.update(changeset) do
       {:ok, playlist} ->
-        render(conn, "show.json", playlist: playlist)
+        conn
+        |> json(playlist)
       {:error, changeset} ->
         conn
-        |> put_status(:unprocessable_entity)
-        |> render(LoudBackend.ChangesetView, "error.json", changeset: changeset)
+        |> put_status(401)
+        |> json(%{error: Enum.join(translate_changeset_errors(changeset), ", ")})
     end
   end
 
