@@ -37,13 +37,13 @@ defmodule LoudBackend.AuthController do
     case Repo.insert(changeset) do
       {:ok, user} ->
         # Start temporary shit
-        tracks = Repo.all(Track)
+        # tracks = Repo.all(Track)
 
-        changeset = Playlist.changeset(%Playlist{}, %{name: "Sample playlist 1"})
-          |> Ecto.Changeset.put_assoc(:user, user)
-          |> Ecto.Changeset.put_assoc(:tracks, tracks)
+        # changeset = Playlist.changeset(%Playlist{}, %{name: "Sample playlist 1"})
+        #   |> Ecto.Changeset.put_assoc(:user, user)
+        #   |> Ecto.Changeset.put_assoc(:tracks, tracks)
 
-        Repo.insert!(changeset)
+        # Repo.insert!(changeset)
         # End temporary shit
 
         generate_token_and_render(conn, user)
