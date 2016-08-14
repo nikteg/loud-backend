@@ -10,8 +10,8 @@ defmodule LoudBackend.PlaylistController do
 
   def index(conn, _params) do
     user = Guardian.Plug.current_resource(conn)
-    playlists = Repo.all(from(p in Playlist, where: p.user_id == ^user.id, preload: :tracks))
-    render(conn, "index.json", playlists: playlists)
+    playlists = Repo.all(from(p in Playlist, where: p.user_id == ^user.id, order_by: p.id, preload: :tracks, preload: :user))
+    conn |> json(playlists)
   end
 
   def create(conn, %{"name" => name} = params) do
@@ -38,7 +38,7 @@ defmodule LoudBackend.PlaylistController do
 
   def show(conn, %{"id" => id}) do
     [playlist] = Repo.all(from(p in Playlist, where: p.id == ^id, preload: :tracks))
-    render(conn, "show.json", playlist: playlist)
+    conn |> json(playlist)
   end
 
   def update(conn, %{"id" => id} = params) do
@@ -74,6 +74,6 @@ defmodule LoudBackend.PlaylistController do
     # it to always work (and if it does not, it will raise).
     Repo.delete!(playlist)
 
-    send_resp(conn, :no_content, "")
+    conn |> json(%{message: "Playlist deleted"})
   end
 end
