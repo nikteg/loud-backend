@@ -10,7 +10,7 @@ defmodule LoudBackend.PlaylistController do
 
   def index(conn, _params) do
     user = Guardian.Plug.current_resource(conn)
-    playlists = Repo.all(from(p in Playlist, where: p.user_id == ^user.id, order_by: p.id, preload: :tracks, preload: :user))
+    playlists = Repo.all(from(p in Playlist, where: p.user_id == ^user.id, order_by: [desc: p.id], preload: :tracks, preload: :user))
     conn |> json(playlists)
   end
 
