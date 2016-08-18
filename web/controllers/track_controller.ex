@@ -54,4 +54,17 @@ defmodule LoudBackend.TrackController do
 
     send_resp(conn, :no_content, "")
   end
+
+  def search(conn, %{"query" => query}) do
+    cond do
+      query == "" ->
+        conn |> json(%{error: "Empty query"})
+      true ->
+        query = String.replace(query, " ", "+") <> ":*"
+        tracks = Repo.all(from t in Track, where: fragment("(artist || ' ' || name @@ to_tsquery(?))", ^query))
+
+        conn |> json(tracks)
+    end
+
+  end
 end

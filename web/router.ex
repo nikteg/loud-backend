@@ -20,5 +20,6 @@ defmodule LoudBackend.Router do
 
     resources "/playlists", PlaylistController
     resources "/tracks", TrackController
+    post "/tracks/search", TrackController, :search
   end
 end
