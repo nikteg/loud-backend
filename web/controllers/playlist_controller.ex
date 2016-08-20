@@ -6,7 +6,7 @@ defmodule LoudBackend.PlaylistController do
   import LoudBackend.ErrorHelpers, only: [translate_changeset_errors: 1]
 
   # plug Guardian.Plug.EnsureAuthenticated, [handler: LoudBackend.GuardianErrorHandler] when not action in [:index, :show]
-  plug Guardian.Plug.EnsureAuthenticated, [handler: LoudBackend.GuardianErrorHandler]
+  plug Guardian.Plug.EnsureAuthenticated, [handler: LoudBackend.GuardianErrorHandler] when not action in [:show]
 
   def index(conn, _params) do
     user = Guardian.Plug.current_resource(conn)
@@ -37,13 +37,27 @@ defmodule LoudBackend.PlaylistController do
   end
 
   def show(conn, %{"id" => id}) do
+    user = Guardian.Plug.current_resource(conn)
+
     query = from p in Playlist,
       where: p.id == ^id,
       join: t in assoc(p, :tracks),
-      order_by: t.id
+      order_by: t.id,
+      preload: [tracks: t],
+      preload: :user,
+      limit: 1
 
-    [playlist] = Repo.all(query)
-    conn |> json(playlist)
+    playlist = Repo.one(query)
+
+    IO.inspect playlist
+
+    IO.inspect user
+
+    if (playlist.private && !user) || (user && playlist.user.id != user.id) do
+      conn |> put_status(403) |> json(%{error: "Private playlist"})
+    else
+      conn |> json(playlist)
+    end
   end
 
   def update(conn, %{"id" => id} = params) do

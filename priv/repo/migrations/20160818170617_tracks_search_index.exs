@@ -6,6 +6,6 @@ defmodule LoudBackend.Repo.Migrations.TracksSearchIndex do
   end
 
   def down do
-    execute "DROP INDEX tracks.tsv_idx"
+    execute "DROP INDEX tsv_idx"
   end
 end

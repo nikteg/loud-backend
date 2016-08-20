@@ -18,6 +18,7 @@ defmodule LoudBackend.Router do
       post "/logout", AuthController, :logout
     end
 
+    get "/users/:username", UserController, :show
     resources "/playlists", PlaylistController
     resources "/tracks", TrackController
     post "/tracks/search", TrackController, :search

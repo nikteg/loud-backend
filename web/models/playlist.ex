@@ -1,9 +1,10 @@
 defmodule LoudBackend.Playlist do
   use LoudBackend.Web, :model
 
-  @derive {Poison.Encoder, only: [:id, :name, :user, :tracks]}
+  @derive {Poison.Encoder, only: [:id, :name, :private, :user, :tracks]}
   schema "playlists" do
     field :name, :string
+    field :private, :boolean
 
     belongs_to :user, LoudBackend.User
     many_to_many :tracks, LoudBackend.Track, join_through: "playlist_tracks", on_replace: :delete
@@ -16,7 +17,7 @@ defmodule LoudBackend.Playlist do
   """
   def changeset(struct, params \\ %{}) do
     struct
-    |> cast(params, [:name])
+    |> cast(params, [:name, :private])
     |> cast_assoc(:tracks)
     |> validate_required([:name])
   end
