@@ -14,7 +14,7 @@ defmodule LoudBackend.UserController do
 
     query = from u in User,
       where: u.username == ^username,
-      join: p in assoc(u, :playlists),
+      left_join: p in assoc(u, :playlists),
       preload: [playlists: ^playlists_query],
       limit: 1
 

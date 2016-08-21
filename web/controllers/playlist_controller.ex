@@ -41,11 +41,10 @@ defmodule LoudBackend.PlaylistController do
 
     query = from p in Playlist,
       where: p.id == ^id,
-      join: t in assoc(p, :tracks),
+      left_join: t in assoc(p, :tracks),
       order_by: t.id,
       preload: [tracks: t],
-      preload: :user,
-      limit: 1
+      preload: :user
 
     playlist = Repo.one(query)
 
