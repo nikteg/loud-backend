@@ -48,11 +48,7 @@ defmodule LoudBackend.PlaylistController do
 
     playlist = Repo.one(query)
 
-    IO.inspect playlist
-
-    IO.inspect user
-
-    if (playlist.private && !user) || (user && playlist.user.id != user.id) do
+    if playlist.private && (!user || (user && playlist.user.id != user.id)) do
       conn |> put_status(403) |> json(%{error: "Private playlist"})
     else
       conn |> json(playlist)

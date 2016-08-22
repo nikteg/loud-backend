@@ -7,6 +7,7 @@ defmodule LoudBackend.UserController do
 
   def show(conn, %{"username" => username}) do
     playlists_query = from p in Playlist,
+      where: p.private == false,
       order_by: [desc: p.id],
       left_join: t in assoc(p, :tracks),
       select: %{id: p.id, name: p.name, track_count: count(t.id)},
